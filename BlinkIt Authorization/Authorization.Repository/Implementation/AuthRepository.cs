@@ -8,17 +8,20 @@ public class AuthRepository : IAuthRepository
 {
     private readonly IMongoDatabase _database;
     private readonly IMongoCollection<User> _users;
+    private readonly IMongoCollection<Seller> _sellers;
 
     public AuthRepository()
     {
         var client = new MongoClient("mongodb://praneeth:blinkit@localhost:27017/mydatabase?authSource=admin");
         _database = client.GetDatabase("blinkit");
         _users = _database.GetCollection<User>("UserInformation");
+        _sellers = _database.GetCollection<Seller>("SellerInformation");
     }
     public async Task CreateUserAsync(User newUser)
     {
         await _users.InsertOneAsync(newUser);
     }
+    
     public async Task<User> GetUserByMobileNumberAsync(string mobileNumber)
     {
         return await _users.Find(user => user.MobileNumber == mobileNumber).FirstOrDefaultAsync();

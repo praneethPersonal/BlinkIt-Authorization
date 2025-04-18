@@ -12,47 +12,75 @@ namespace BlinkIt.Service.Implementation;
 public class AuthService : IAuthService
 {
     private readonly IAuthRepository _authRepository;
+    private readonly ISellerRepository _sellerRepository;
     private readonly IConfiguration _configuration;
-    public AuthService(IAuthRepository authRepository, IConfiguration config)
+    public AuthService(IAuthRepository authRepository, IConfiguration config, ISellerRepository sellerRepository)
     {
         _authRepository = authRepository;
         _configuration = config;
+        _sellerRepository = sellerRepository;
     }
     public async Task<(bool Success, string Message, string Token)> CreateNewUser(string mobileNumber, string password, string type)
     {
-        var existingUser = await _authRepository.GetUserByMobileNumberAsync(mobileNumber);
-        if (existingUser != null)
+        if (type == "buyer")
         {
-            return (false, "Mobile number already exists. Cannot create new User.", null);
+            var existingUser = await _authRepository.GetUserByMobileNumberAsync(mobileNumber);
+            if (existingUser != null)
+            {
+                return (false, "Mobile number already exists. Cannot create new User.", null);
+            }
+            var newUser = new User
+            {
+                MobileNumber = mobileNumber,
+                Password = password,
+                Type = type
+            };
+            await _authRepository.CreateUserAsync(newUser);
         }
-
-        var newUser = new User
+        else
         {
-            MobileNumber = mobileNumber,
-            Password = password,
-            Type = type
-        };
-
-        await _authRepository.CreateUserAsync(newUser);
+            var existingSeller = await _sellerRepository.GetSellerByMobileNumberAsync(mobileNumber);
+            if (existingSeller != null)
+            {
+                return (false, "Mobile number already exists. Cannot create new User.", null);
+            }
+            var newSeller = new Seller
+            {
+                MobileNumber = mobileNumber,
+                Password = password,
+                ProductIds = new List<Guid>()
+            };
+            await _sellerRepository.CreateSeller(newSeller);
+        }
 
         var token = GenerateToken(mobileNumber, type);
 
         return (true, "New user created and login successful!", token);
     }
     
-    public async Task<(bool Success, string Message, string Token)> ValidateCredentialsAsync(string mobileNumber, string password)
+    public async Task<(bool Success, string Message, string Token)> ValidateCredentialsAsync(string mobileNumber, string password, string type)
     {
-        var user = await _authRepository.GetUserByMobileNumberAsync(mobileNumber);
-
-        if (user == null)
+        string userPassword;
+        if (type == "buyer")
+        {
+            var user = await _authRepository.GetUserByMobileNumberAsync(mobileNumber);
+            userPassword = user?.Password;
+        }
+        else
+        {
+            var user = await _sellerRepository.GetSellerByMobileNumberAsync(mobileNumber);
+            userPassword = user?.Password;
+        }
+        
+        
+        if (userPassword == null)
         {
             return (false, "Please signup before login!", null);
         }
-
-        if (user.Password == password)
+        if (userPassword == password)
         {
               
-            var token = GenerateToken(mobileNumber, user.Type);
+            var token = GenerateToken(mobileNumber, type);
             return (true, "Login successful!", token);
         }
 

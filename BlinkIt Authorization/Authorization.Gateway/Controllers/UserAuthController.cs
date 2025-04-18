@@ -45,11 +45,37 @@ public class UserAuthController : ControllerBase
             return BadRequest("Mobile number and password are required.");
         }
 
-        var (success, message, token) = await _authService.ValidateCredentialsAsync(loginRequest.MobileNumber, loginRequest.Password);
+        var (success, message, token) = await _authService.ValidateCredentialsAsync(loginRequest.MobileNumber, loginRequest.Password, "buyer");
 
         if (success)
         {
             return Ok(new { Message = message, Token = token });
+        }
+
+        if (message == "Please signup before login!")
+        {
+            return NotFound(message);
+        }
+        return Unauthorized(new { Message = message });
+    }
+    
+    [HttpPost("seller/login")]
+    public async Task<IActionResult> SellerLogin([FromBody] LoginRequest loginRequest)
+    {
+        if (loginRequest == null || string.IsNullOrWhiteSpace(loginRequest.MobileNumber) || string.IsNullOrWhiteSpace(loginRequest.Password))
+        {
+            return BadRequest("Mobile number and password are required.");
+        }
+
+        var (success, message, token) = await _authService.ValidateCredentialsAsync(loginRequest.MobileNumber, loginRequest.Password, "seller");
+
+        if (success)
+        {
+            return Ok(new { Message = message, Token = token });
+        }
+        if (message == "Please signup before login!")
+        {
+            return NotFound(message);
         }
 
         return Unauthorized(new { Message = message });

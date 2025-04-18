@@ -6,5 +6,6 @@ public interface IAuthRepository
 {
     Task<User> GetUserByMobileNumberAsync(string mobileNumber);
     Task CreateUserAsync(User newUser);
+    
     void ChangePasswordAsync(string mobileNumber, string currentPassword, string newPassword);
 }
