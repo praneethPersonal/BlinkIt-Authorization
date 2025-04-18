@@ -11,6 +11,7 @@ namespace BlinkIt.Gateway.Controllers;
 [Route("api/[controller]")]
 public class UserAuthController : ControllerBase
 {
+    //https://lucid.app/lucidchart/cfda0c8f-cd97-46ca-99cb-d1f3c8619f8e/edit?beaconFlowId=A9E61C0F49CF0490&invitationId=inv_77497333-eb94-49c9-8686-34f4c978d5d1&page=0_0#
     private readonly IAuthService _authService;
     public UserAuthController(IAuthService authService)
     {
