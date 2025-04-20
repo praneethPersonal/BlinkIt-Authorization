@@ -101,7 +101,7 @@ public class UserAuthController : ControllerBase
         var success = await _authService.ChangePasswordAsync(mobileNumber, request.CurrentPassword, request.NewPassword);
 
         if (success)
-        {
+        {    
             return Ok("Password changed successfully.");
         }
         return BadRequest("Current password is incorrect or could not change password.");

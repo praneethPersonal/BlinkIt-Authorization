@@ -94,6 +94,17 @@ public class AuthService : IAuthService
         _authRepository.ChangePasswordAsync(mobileNumber, currentPassword, newPassword);
         return true;
     }
+
+    public async Task<bool> AddProductToSellerAsync(string mobileNumber, Guid productId)
+    {
+        var sellerInfo = await _sellerRepository.GetSellerByMobileNumberAsync(mobileNumber);
+        if (sellerInfo == null)
+        {
+            return false;
+        }
+        await _sellerRepository.UpdateSellerProducts( mobileNumber, productId);
+        return true;
+    }
     
     private string GenerateToken(string mobileNumber, string type)
     {

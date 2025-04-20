@@ -13,8 +13,8 @@ public class SellerRepository: ISellerRepository
     public SellerRepository()
     {
         var client = new MongoClient("mongodb://praneeth:blinkit@localhost:27017/mydatabase?authSource=admin");
-        _database = client.GetDatabase("blinkit");
-        _sellers = _database.GetCollection<Seller>("SellerInformation");
+        _database = client.GetDatabase("Blinkit-Users");
+        _sellers = _database.GetCollection<Seller>("sellerInfo");
     }
     
     public async Task CreateSeller(Seller newSeller)
@@ -25,4 +25,13 @@ public class SellerRepository: ISellerRepository
     {
         return await _sellers.Find(user => user.MobileNumber == mobileNumber).FirstOrDefaultAsync();
     }
+
+    public async Task UpdateSellerProducts(string sellerId, Guid productId)
+    {
+        var filter = Builders<Seller>.Update.Push(u => u.ProductIds, productId);
+
+        await _sellers.UpdateOneAsync(u => u.MobileNumber == sellerId, filter);
+
+    }
+
 }

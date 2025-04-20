@@ -13,9 +13,9 @@ public class AuthRepository : IAuthRepository
     public AuthRepository()
     {
         var client = new MongoClient("mongodb://praneeth:blinkit@localhost:27017/mydatabase?authSource=admin");
-        _database = client.GetDatabase("blinkit");
-        _users = _database.GetCollection<User>("UserInformation");
-        _sellers = _database.GetCollection<Seller>("SellerInformation");
+        _database = client.GetDatabase("Blinkit-Users");
+        _users = _database.GetCollection<User>("buyerInfo");
+        _sellers = _database.GetCollection<Seller>("sellerInfo");
     }
     public async Task CreateUserAsync(User newUser)
     {

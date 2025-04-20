@@ -11,5 +11,6 @@ public class Seller
 
     [BsonElement("Password")]
     public string Password { get; set; }
+    [BsonRepresentation(BsonType.String)]
     public List<Guid> ProductIds { get; set; } = new();
 }
